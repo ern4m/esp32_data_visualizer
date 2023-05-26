@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Socket.IO graph</title>
+    <style>
+      body {
+        margin: 0;
+        padding-bottom: 3rem;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+      }
+
+      #container {
+        margin: auto auto;
+        width: 80%;
+      }
+
+      #chart {
+        align-self: center;
+      }
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script
+      src="https://cdn.plot.ly/plotly-2.20.0.min.js"
+      charset="utf-8"
+    ></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="chart"></div>
+    </div>
+    <!-- <ul id="messages"></ul>
+    <form id="form" action="">
+      <input id="input" autocomplete="off" /><button>Send</button>
+    </form> -->
+
+    <script>
+      let myChart = Plotly.newPlot("chart", [
+        {
+          y: [],
+          type: "line",
+        },
+      ]);
+
+      var socket = io();
+
+      let randomID = () => {
+        const num = 4;
+        const randomNameGenerator = (num) => {
+          let res = "";
+          for (let i = 0; i < num; i++) {
+            const random = Math.floor(Math.random() * 27);
+            res += String.fromCharCode(97 + random);
+          }
+          return res;
+        };
+        return randomNameGenerator(num);
+      };
+
+      var cnt = 0;
+
+      socket.on("chart_data", (data) => {
+        Plotly.extendTraces("chart", { y: [data] }, [0]);
+        myChart.then(result => {console.log(result.data[0].y.length)});
+
+        cnt += 16;
+        if (cnt > 500) {
+          Plotly.relayout("chart", {
+            xaxis: {
+              range: [cnt - 500, cnt],
+            },
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
