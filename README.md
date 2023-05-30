@@ -26,17 +26,15 @@ Este projeto foi realizado como trabalho avaliatório relacionado às disciplina
 4. :yellow_circle: Desenvolvimento do código da Dashboard:
     * :green_circle: Definição dos módulos necessários:
       * Servidor: express + sockets.io
-      * Banco de dados: A definir (mongo ou postgresql)
-      * Biblioteca de gráficos: Plot.ly JS
+      * Banco de dados: Mongo
+      * Biblioteca de gráficos: Plotly JS
     * :yellow_circle: Funcionalidades:
       * :yellow_circle: Servidor:
         * :green_circle: Endpoint para receber dados;
-        * :yellow_circle: Inserção dos dados no banco;
-        * :yellow_circle: Emissão de novos dados por sockets (comunicação deve ser ativada pelo banco);  
+        * :green_circle: Inserção dos dados no banco;
+        * :green_circle: Emissão de novos dados por sockets (paralelamente à inserção no banco);  
       * :green_circle: Gráfico:
         * Inserir novos dados;
         * Definir janela de visualização do gráfico;
       * :yellow_circle: Banco:
         * :yellow_circle: Definir estrutura de dados a ser utilizada;
-        * :yellow_circle: Implementar funcionalidade de trigger quando dados novos forem inseridos;
- 
