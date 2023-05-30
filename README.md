@@ -17,7 +17,7 @@ Este projeto foi realizado como trabalho avaliatório relacionado às disciplina
       * módulo FFT;
       * ...
    * :green_circle: Coleta de dados:
-     * Loop delay: 5 milisegundos 
+     * Loop delay: 5 microsegundos 
      * Valor de amostras (N): 16;
    * :yellow_circle: Funcionalidades:
      * :yellow_circle: Realizar a função de FFT sobre os dados coletados;
