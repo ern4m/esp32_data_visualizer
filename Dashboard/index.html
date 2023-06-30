@@ -1,77 +1,109 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Socket.IO graph</title>
-    <style>
-      body {
-        margin: 0;
-        padding-bottom: 3rem;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
-      }
 
-      #container {
-        margin: auto auto;
-        width: 80%;
-      }
+<head>
+  <title>Dashboard ESP32</title>
+  <link rel="icon" src="./favicon.ico">
+  <style>
+    body {
+      margin: 0;
+      padding-bottom: 3rem;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
+    }
 
-      #chart {
-        align-self: center;
-      }
-    </style>
-    <script src="/socket.io/socket.io.js"></script>
-    <script
-      src="https://cdn.plot.ly/plotly-2.20.0.min.js"
-      charset="utf-8"
-    ></script>
-  </head>
-  <body>
-    <div id="container">
-      <div id="chart"></div>
-    </div>
-    <!-- <ul id="messages"></ul>
+    #container {
+      margin: auto auto;
+      width: 80%;
+    }
+
+    #chart {
+      align-self: center;
+    }
+  </style>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.plot.ly/plotly-2.20.0.min.js" charset="utf-8"></script>
+</head>
+
+<body class="bg-gray-700">
+  <div class="grid h-50 place-items-center mt-5">
+    <div class="text-2xl font-bold text-white">Análise de Input Sonoro com ESP32 e sensor KY-037</div>
+    <div class="text-white" id="mag">Magnitude máxima:</div>
+    <div class="text-white" id="db">Db máximo:</div>
+    <!-- <div class="text-white" id="freq">Frequência fundamental dos ultimos dados:</div> -->
+    <div class="text-white" id="dados">Ultimos Dados:</div>
+    <div id="chart" class="m-2"></div>
+    <div id="chart2"></div>
+  </div>
+  <!-- <ul id="messages"></ul>
     <form id="form" action="">
       <input id="input" autocomplete="off" /><button>Send</button>
     </form> -->
 
-    <script>
-      let myChart = Plotly.newPlot("chart", [
-        {
-          y: [],
-          type: "line",
-        },
-      ]);
+  <script>
+    let dados = document.getElementById("dados")
+    let mag = document.getElementById("mag")
+    let db = document.getElementById("db")
+    let freq_fund = document.getElementById("freq")
+    let myChart = Plotly.newPlot("chart", [
+      {
+        y: [],
+        type: "line",
+      },
+    ], {
+      title: {
+        text: "Sinal de Entrada"
+      }
+    });
+    let myChart2 = Plotly.newPlot("chart2", [
+      {
+        y: [],
+        type: "line",
+      },
+    ], {
+      title: {
+        text: "FFT"
+      }
+    }
+    );
+    var socket = io();
 
-      var socket = io();
-
-      let randomID = () => {
-        const num = 4;
-        const randomNameGenerator = (num) => {
-          let res = "";
-          for (let i = 0; i < num; i++) {
-            const random = Math.floor(Math.random() * 27);
-            res += String.fromCharCode(97 + random);
-          }
-          return res;
-        };
-        return randomNameGenerator(num);
-      };
-
-      var cnt = 0;
-
-      socket.on("chart_data", (data) => {
-        Plotly.extendTraces("chart", { y: [data] }, [0]);
-        myChart.then(result => {console.log(result.data[0].y.length)});
-
-        cnt += 16;
-        if (cnt > 500) {
-          Plotly.relayout("chart", {
-            xaxis: {
-              range: [cnt - 500, cnt],
-            },
-          });
+    let randomID = () => {
+      const num = 4;
+      const randomNameGenerator = (num) => {
+        let res = "";
+        for (let i = 0; i < num; i++) {
+          const random = Math.floor(Math.random() * 27);
+          res += String.fromCharCode(97 + random);
         }
-      });
-    </script>
-  </body>
+        return res;
+      };
+      return randomNameGenerator(num);
+    };
+
+    var cnt = 0;
+
+    socket.on("chart_data", (packet) => {
+      console.log(packet)
+      dados.innerText = "Últimos dados: " + packet["data"];
+      mag.innerText = "Magnitude máxima: " + packet["maxMag"][0].toFixed(2);
+      db.innerText = "Db Máximo: " + packet["maxDb"].toFixed(2) + " db.";
+      // Gráfico do Sinal
+      Plotly.extendTraces("chart", { y: [packet["data"]] }, [0]);
+      myChart.then(result => { console.log(result.data[0].y.length) });
+      cnt += 16;
+      if (cnt > 500) {
+        Plotly.relayout("chart", {
+          xaxis: {
+            range: [cnt - 500, cnt],
+          },
+        });
+      }
+      // Gráfico da FFT
+      Plotly.restyle("chart2", 'y', [packet["fft_data"]]);
+    });
+  </script>
+</body>
+
 </html>

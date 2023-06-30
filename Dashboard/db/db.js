@@ -1,10 +1,13 @@
 import { MongoClient } from "mongodb";
 import { config } from "dotenv";
 
-const uri =
-  config({ path: "Dashboard/.env" }).parsed.DB_URI + "/esp_data" || "";
+// configura o .env
+await config()
+// console.log(process.env)
+const uri = process.env.DB_URI || "";
+console.log(uri)
 
-export const client = new MongoClient(uri);
+export const client = new MongoClient("mongodb://0.0.0.0:27017");
 
 export const insertData = async (collection, data) => {
   // no momento o doc só ta aceitando um array de data
@@ -17,14 +20,12 @@ export const insertData = async (collection, data) => {
   return result;
 };
 
-// const collection = client.db().collection("data");
+export const deleteAll = async (collection) => {
+  const result = await collection.deleteMany();
+  return result;
+}
 
-// collection
-//   .find()
-//   .toArray()
-//   .then((documents) => {
-//     console.log("Retrieved documents:", documents);
-//   })
-//   .catch((err) => {
-//     console.error("Error retrieving documents:", err);
-//   });
+
+// Clear db
+// const collection = client.db("esp").collection("data");
+// deleteAll(collection)
